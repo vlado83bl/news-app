@@ -1,5 +1,19 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import Home from '../views/Home.vue';
+import NewsList from '../views/NewsList.vue';
+import DeleteNewsDialog from '../components/UI/DeleteNewsDialog.vue'
+
+// route guard
+import { projectAuth } from '../firebase/config';
+
+const requireAuth = (to, from, next) => {
+  let user = projectAuth.currentUser;
+  if(!user) {
+    next({ name: 'Home'})
+  } else {
+    next();
+  }
+}
 
 const routes = [
   {
@@ -8,12 +22,17 @@ const routes = [
     component: Home
   },
   {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
+    path: '/newslist',
+    name: 'NewsList',
+    component: NewsList,
+    beforeEnter: requireAuth
+  },
+  {
+    path: '/newslist/:id',
+    name: 'DeleteNewsDialog',
+    component: DeleteNewsDialog,
+    props: true,
+    beforeEnter: requireAuth
   }
 ]
 
